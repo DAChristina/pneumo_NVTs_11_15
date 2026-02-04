@@ -1,0 +1,46 @@
+# small modifications coz' Naura use " " in all of the cps files
+# change " " to "_"
+
+for obj in /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/serogroup_15/*/*.gbk; do
+	mv "$obj" "$(echo "$obj" | sed "s/ /_/")";
+done
+
+
+# generate list of all available 11A & serogroup15
+ls /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/11A > /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A.csv
+ls /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/serogroup_15/*/ > /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15.csv
+
+# I edited the file in R and then changed the output by removing additional ^M$ in terminal
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A_edited.csv
+sed -i 's/\r$//' /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A_edited.csv
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A_edited.csv
+
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15_edited.csv
+sed -i 's/\r$//' /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15_edited.csv
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15_edited.csv
+
+
+############################################################################################################################################################
+# enter zBD requirement
+SOURCE:
+https://github.com/metagenlab/zDB
+https://github.com/metagenlab/zDB#setting-up-the-reference-databases
+
+# zDB contains 3 parts: zdb setup; zdb run; zdb webapp
+
+# assuming zDB has already installed using conda, adjust zdb setup first
+conda activate zdb_env
+zdb setup --setup_base_db --pfam --cog --conda
+zdb setup --pfam --conda
+zdb setup --setup_base_db
+
+
+# for 11A
+zdb run --input=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A_edited.csv \
+	# --refseq=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/ref_genes/Ref_11A_CR931653.gbk \
+	--out=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/11A \
+	--minimal
+
+
+
+# for serogroup 15

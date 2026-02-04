@@ -1,0 +1,12 @@
+# create new branch
+cd /mnt/d/naura_ashanna_cps_genes/
+git status
+
+# initiate git
+git init
+git add .
+
+git checkout -b main
+git status
+git add --all
+git commit -m "initiate git for r proj"

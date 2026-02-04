@@ -1,0 +1,12 @@
+
+# annoying windows text issue
+sed -i 's/\r$//' /mnt/d/naura_ashanna_cps_genes/raw_data/troublematic_samples.txt
+
+
+while read ID; do
+  unicycler \
+    -1 /mnt/d/naura_ashanna_cps_genes/raw_data/all_fastq/${ID}_1.fastq.gz \
+    -2 /mnt/d/naura_ashanna_cps_genes/raw_data/all_fastq/${ID}_2.fastq.gz \
+    -o /mnt/d/naura_ashanna_cps_genes/outputs/unicycler/${ID} \
+    -t 16
+done < /mnt/d/naura_ashanna_cps_genes/raw_data/troublematic_samples.txt

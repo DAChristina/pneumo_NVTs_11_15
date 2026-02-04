@@ -1,0 +1,166 @@
+
+Update 13 January 2026 (Tuesday)
+Data copy report from multiple hard drives (YM) to DC for Naura & Ashanna research project
+FastQ files are required for gps_pipeline; are separated into multiple folders and hard drives
+
+Check list_all_data.csv file first; sometimes it add other symbols from windows
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data.csv
+sed -i 's/\r$//' /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data.csv
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data.csv
+
+We designed a script to recursively detect and copy fastq data from multiple hard drives to a desired folder:
+while IFS= read -r pattern; do
+	sudo find /mnt/f \
+	\( -path "/mnt/f/System Volume Information" -o -path "/mnt/f/$RECYCLE.BIN" \) -prune -o \
+		-type f -name "$pattern" 2>/dev/null \
+		-exec cp -v {} /mnt/d/naura_ashanna_cps_genes/raw_data/all_fastq \;
+done < /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data.csv
+
+
+To minimise searching time, I create a new list updated by available files called list_all_data2.csv by conducting anti_join compared to the previous list (1).
+> to generate output; < to retrieve input.
+
+ls /mnt/d/naura_ashanna_cps_genes/raw_data/all_fastq > /mnt/d/naura_ashanna_cps_genes/inputs/list_available_files1.csv
+
+I personally edited the file in R
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data2.csv
+sed -i 's/\r$//' /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data2.csv
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data2.csv
+
+while IFS= read -r pattern; do
+	sudo find /mnt/f \
+	\( -path "/mnt/f/System Volume Information" -o -path "/mnt/f/$RECYCLE.BIN" \) -prune -o \
+		-type f -name "$pattern" 2>/dev/null \
+		-exec cp -v {} /mnt/d/naura_ashanna_cps_genes/raw_data/all_fastq \;
+done < /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data2.csv
+
+
+To minimise searching time, I create a new list updated by available files called list_all_data2.csv by conducting anti_join compared to the previous list (2).
+> to generate output; < to retrieve input.
+
+ls /mnt/d/naura_ashanna_cps_genes/raw_data/all_fastq > /mnt/d/naura_ashanna_cps_genes/inputs/list_available_files2.csv
+
+I personally edited the file in R
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data3.csv
+sed -i 's/\r$//' /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data3.csv
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data3.csv
+
+while IFS= read -r pattern; do
+	sudo find /mnt/f \
+	\( -path "/mnt/f/System Volume Information" -o -path "/mnt/f/$RECYCLE.BIN" \) -prune -o \
+		-type f -name "$pattern" 2>/dev/null \
+		-exec cp -v {} /mnt/d/naura_ashanna_cps_genes/raw_data/all_fastq \;
+done < /mnt/d/naura_ashanna_cps_genes/inputs/list_all_data3.csv
+
+
+
+
+
+
+
+
+
+
+
+
+
+$ find /media/<PC ID>/<hard drive name>/ -type f \
+	-exec cp -v {} /home/<PC ID>/<Documents or any other folder>/<desired folder>/ 
+
+(OR, use this script instead)
+$ find /media/<PC ID>/<hard drive name>/ -type f \
+    -wholename "*/assemblies/*.fasta" ! -name "*discarded.fasta" \
+    -exec cp -v -t "/home/<PC ID>/<Documents or any other folder>/<desired folder>/" {} +
+
+Then I conducted a copy based on sampling location to their designated folder
+$ cd /home/yus013/Documents/fasta_contigs_all
+$ mkdir LBK_SWQ
+
+$ for f in /home/yus013/Documents/fasta_contigs_all/fasta_contigs_mixed/*LBK*; do
+  cp "$f" "/home/yus013/Documents/fasta_contigs_all/LBK_SWQ/$(basename "$f")"
+done
+
+$ for f in /home/yus013/Documents/fasta_contigs_all/fasta_contigs_mixed/*SWQ*; do
+  cp "$f" "/home/yus013/Documents/fasta_contigs_all/LBK_SWQ/$(basename "$f")"
+done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# old script for fasta data ####################################################################################################################
+We designed a script to recursively detect and copy fasta data (not *discarded.fasta) from multiple hard drives to a desired folder:
+$ find /media/<PC ID>/<hard drive name>/ -type f \
+	-wholename "*/assemblies/*.fasta" ! -name "*discarded.fasta" \
+	-exec cp -v {} /home/<PC ID>/<Documents or any other folder>/<desired folder>/ 
+
+(OR, use this script instead)
+$ find /media/<PC ID>/<hard drive name>/ -type f \
+    -wholename "*/assemblies/*.fasta" ! -name "*discarded.fasta" \
+    -exec cp -v -t "/home/<PC ID>/<Documents or any other folder>/<desired folder>/" {} +
+
+Then I conducted a copy based on sampling location to their designated folder
+$ cd /home/yus013/Documents/fasta_contigs_all
+$ mkdir LBK_SWQ
+
+$ for f in /home/yus013/Documents/fasta_contigs_all/fasta_contigs_mixed/*LBK*; do
+  cp "$f" "/home/yus013/Documents/fasta_contigs_all/LBK_SWQ/$(basename "$f")"
+done
+
+$ for f in /home/yus013/Documents/fasta_contigs_all/fasta_contigs_mixed/*SWQ*; do
+  cp "$f" "/home/yus013/Documents/fasta_contigs_all/LBK_SWQ/$(basename "$f")"
+done
+
+Test available fasta for LBK and SWQ
+$ ls | wc -l # do not pipe ll with wc -l
+$ ll | grep "SWQ" | wc -l
+$ ll | grep "LBK" | wc -l
+
+####################################################################################################################################################
+Fasta file screening and analyses
+1. I removed 11 files with duplicated copy (files with additional "(1)" in their name).
+$ find . -name '*\(1\)*'
+$ find . -name '*\(1\)*' -exec rm -rf {} +
+
+2. I fixed naming inconsistencies between <area> and <ID>
+$ cd /home/yus013/Documents/fasta_contigs_all/fasta_contigs_inconsistent_id_49_fasta
+$ for file in *_LBK*; do
+	mv "$file" "${file/_LBK/_LBK_}"
+done
+$ for file in *_SWQ*; do
+	mv "$file" "${file/_SWQ/_SWQ_}"
+done
+
+(Again, I re-checked the content of the duplicated files after conducting re-name)
+
+3. I created file list name and reanalysed the data on R based on pathogenWatch analyses.
+
+
+
+
+4. Further bioinformatic analyses to be confirmed for all data:
+	1. N50 (assembly-stats)
+	2. Blast for ply gene
+	3. MLST
+	4. pneumoKITy
+5. I created File list for files considered as pure pneumo (1.9-2.3Mb)
+6. I generated phylogenetic trees for those considered as pure pneumo ()
+
+
+
+

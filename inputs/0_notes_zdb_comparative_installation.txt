@@ -1,0 +1,42 @@
+1. zDB installation
+2. zDB usage
+
+
+########################################################################################################
+1. zDB installation
+source:
+https://github.com/metagenlab/zDB
+
+conda activate zdb_env
+conda install zdb -c conda-forge -c bioconda
+
+
+
+
+
+
+
+
+
+
+
+
+########################################################################################################
+2. zDB usage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
