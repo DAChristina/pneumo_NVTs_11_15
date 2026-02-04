@@ -10,3 +10,9 @@ git checkout -b main
 git status
 git add --all
 git commit -m "initiate git for r proj"
+
+# push to GitHub
+git remote add origin https://github.com/DAChristina/pneumo_NVTs_11_15.git
+git branch -M main
+git remote add origin https://ghp_<my_token>@github.com/<my_ID>/<my_repo>.git
+git push -u origin main
