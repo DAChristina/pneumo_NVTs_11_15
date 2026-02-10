@@ -1,0 +1,46 @@
+# 11A
+# notes for file address
+/mnt/d/naura_ashanna_cps_genes/inputs/prepare_gubbins/11A
+
+# create tsv list file
+for f in /mnt/d/naura_ashanna_cps_genes/inputs/prepare_gubbins/11A/*.fasta; do \
+	echo -e "${f%.fasta}\t${f}"; \
+	done > /mnt/d/naura_ashanna_cps_genes/inputs/prepare_gubbins/isolates_11A.list
+
+# generate alignment file
+generate_ska_alignment.py \
+	--reference /mnt/d/naura_ashanna_cps_genes/inputs/prepare_gubbins/AP200_11A_GPSC3_CP002121.fasta \
+	--input /mnt/d/naura_ashanna_cps_genes/inputs/prepare_gubbins/isolates_11A.list \
+	--out /mnt/d/naura_ashanna_cps_genes/outputs/gubbins/11A/out.aln
+
+# navigate to outputs folder to avoid mv
+cd /mnt/d/naura_ashanna_cps_genes/outputs/gubbins/11A/
+run_gubbins.py \
+	--prefix gubbins_out /mnt/d/naura_ashanna_cps_genes/outputs/gubbins/11A/out.aln \
+	--threads 20
+
+# mv /home/genomics/miniconda3/envs/gubbins_env/bin/gubbins_out* /mnt/d/naura_ashanna_cps_genes/outputs/gubbins/11A/
+
+
+############################################################################################################
+# serogroup 15 --> ref using 15C (gene content for cps locus favoured 15B)
+# notes for file address
+/mnt/d/naura_ashanna_cps_genes/inputs/prepare_gubbins/serogroup_15
+
+# create tsv list file
+for f in /mnt/d/naura_ashanna_cps_genes/inputs/prepare_gubbins/serogroup_15/*.fasta; do \
+	echo -e "${f%.fasta}\t${f}"; \
+	done > /mnt/d/naura_ashanna_cps_genes/inputs/prepare_gubbins/isolates_serogroup_15.list
+
+# generate alignment file
+generate_ska_alignment.py \
+	--reference /mnt/d/naura_ashanna_cps_genes/inputs/prepare_gubbins/PZ900700608_15B_GPSC4_CP060156.fasta \
+	--input /mnt/d/naura_ashanna_cps_genes/inputs/prepare_gubbins/isolates_serogroup_15.list \
+	--out /mnt/d/naura_ashanna_cps_genes/outputs/gubbins/serogroup_15/out.aln
+
+# navigate to outputs folder to avoid mv
+cd /mnt/d/naura_ashanna_cps_genes/outputs/gubbins/serogroup_15/
+run_gubbins.py \
+	--prefix gubbins_out /mnt/d/naura_ashanna_cps_genes/outputs/gubbins/serogroup_15/out.aln \
+	--threads 20
+

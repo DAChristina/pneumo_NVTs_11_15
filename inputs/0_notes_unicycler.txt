@@ -10,3 +10,10 @@ while read ID; do
     -o /mnt/d/naura_ashanna_cps_genes/outputs/unicycler/${ID} \
     -t 16
 done < /mnt/d/naura_ashanna_cps_genes/raw_data/troublematic_samples.txt
+
+
+# Seqkit remove < 200 nt
+for obj in /mnt/d/naura_ashanna_cps_genes/outputs/unicycler/*/*.fasta; do
+	seqkit seq -m 200 \
+		"$obj" > "${obj%.fasta}_filtered_200nt.fasta"
+done

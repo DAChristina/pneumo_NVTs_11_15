@@ -39,8 +39,9 @@ zdb setup --setup_base_db
 zdb run --input=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A_edited.csv \
 	# --refseq=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/ref_genes/Ref_11A_CR931653.gbk \
 	--out=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/11A \
-	--minimal
+	--minimal \
+	--resume
 
-
+zdb webapp
 
 # for serogroup 15
