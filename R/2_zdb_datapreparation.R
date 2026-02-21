@@ -20,26 +20,29 @@ rest11A_edited <- read.csv("inputs/prepare_zdb/list_available_files11A_edited.cs
   glimpse()
 
 # edit list for serogroup 15 ###################################################
-rest15 <- read.csv("inputs/prepare_zdb/list_available_files15.csv",
-                    header = FALSE
-) %>% 
-  dplyr::filter(!stringr::str_detect(V1, "/mnt/d/"),
-                !stringr::str_detect(V1, ".html"),
-                !stringr::str_detect(V1, ".png")
-                ) %>% 
-  dplyr::transmute(
-    name = V1,
-    file = paste0("/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/*/", name)
-  ) %>%
-  # view() %>% 
-  glimpse()
+sg15_list <- c("A", "B", "C", "F")
 
-write.csv(rest15,
-          "inputs/prepare_zdb/list_available_files15_edited.csv",
-          quote = FALSE,
-          row.names = FALSE)
+for (i in sg15_list){
+  df <- read.csv(paste0("inputs/prepare_zdb/list_available_files15",
+                        i,
+                        ".csv"),
+                 header = FALSE
+  ) %>% 
+    dplyr::transmute(
+      name = V1,
+      file = paste0("/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/serogroup_15/15", i, "/", name)
+    ) %>%
+    # view() %>% 
+    glimpse()
+  
+  write.csv(df,
+            paste0("inputs/prepare_zdb/list_available_files15", i, "_edited.csv"),
+            quote = FALSE,
+            row.names = FALSE)
+}
 
 
-rest15_edited <- read.csv("inputs/prepare_zdb/list_available_files15_edited.csv") %>% 
+# test
+rest15A_edited <- read.csv("inputs/prepare_zdb/list_available_files15A_edited.csv") %>% 
   glimpse()
 

@@ -10,14 +10,25 @@ done
 ls /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/11A > /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A.csv
 ls /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/serogroup_15/*/ > /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15.csv
 
+# loop for serogroup 15
+for folder in /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/serogroup_15/*/; do
+	base=$(basename "$folder")
+	ls "$folder" > /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files"${base}".csv;
+done
+
+
+
 # I edited the file in R and then changed the output by removing additional ^M$ in terminal
 cat -A /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A_edited.csv
 sed -i 's/\r$//' /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A_edited.csv
 cat -A /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A_edited.csv
 
-cat -A /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15_edited.csv
-sed -i 's/\r$//' /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15_edited.csv
-cat -A /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15_edited.csv
+for file in /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15*_edited.csv; do
+	sed -i 's/\r$//' "$file";
+done
+
+# test
+cat -A /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15A_edited.csv
 
 
 ############################################################################################################################################################
@@ -30,18 +41,107 @@ https://github.com/metagenlab/zDB#setting-up-the-reference-databases
 
 # assuming zDB has already installed using conda, adjust zdb setup first
 conda activate zdb_env
-zdb setup --setup_base_db --pfam --cog --conda
-zdb setup --pfam --conda
-zdb setup --setup_base_db
+
+# set setup at singularity_dir failed
+# cd /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/singularity_dir/
+
+# zdb setup --setup_base_db --pfam --cog \
+	# --dir=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/singularity_dir/ \
+	# --conda
+
+zdb setup --setup_base_db \
+	# --dir=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/singularity_dir/ \
+	--conda
 
 
+############################################################################################################################################################
 # for 11A
+# not sure why some flags are horribly failed
+# --out flag failed, navigate to out folder first also failed!
+# cd /mnt/d/naura_ashanna_cps_genes/outputs/zdb/11A/
+
 zdb run --input=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files11A_edited.csv \
+	--ref_dir=/home/genomics \
 	# --refseq=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/ref_genes/Ref_11A_CR931653.gbk \
+	# --singularity_dir=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/singularity_dir/singularity \
 	--out=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/11A \
+	--name=11A \
+	--cpu=20 \
 	--minimal \
 	--resume
 
-zdb webapp
+zdb export --name=infallible_poincare
+# zdb import --outdir=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/11A
+# fucking inconsistent flag naming dumbass. Better to manually unpack it.
 
+zdb webapp --name=infallible_poincare \
+	--dir=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/11A/infallible_poincare
+cd /mnt/d/naura_ashanna_cps_genes/outputs/zdb/11A/
+Starting web server. The application will be accessible @172.21.47.201 172.17.0.1  on port 8080
+
+# use ip addr to show WSL's IP address if failed:
+ip addr show eth0
+inet 172.21.47.201/20 brd 172.21.47.255 scope global eth0
+http://172.21.47.201:8080
+
+# prepare cps fasta for BLAST homology search (from gbk)
+extractfeat /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/ref_genes/Ref_11A_CR931653.gbk \
+	-type CDS \
+	-describe gene,product \
+	-outseq /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/ref_genes/Ref_11A_CR931653.fna
+
+# loop
+for gbk in /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/ref_genes/*.gbk; do
+	base=$(basename $gbk .gbk)
+	extractfeat "$gbk" \
+		-type CDS \
+		-describe gene,product \
+		-outseq /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/ref_genes/"${base}.fna"
+done
+
+
+############################################################################################################################################################
 # for serogroup 15
+# not sure why some flags are horribly failed
+# --out flag failed, navigate to out folder first also failed!
+# cd /mnt/d/naura_ashanna_cps_genes/outputs/zdb/serogroup_15/
+
+# if zdb run failed, try reinstall zdb_base
+cd $HOME
+zdb setup --setup_base_db --conda
+# then, consider ignoring the --ref_dir flag.
+
+cd $HOME || exit
+zdb setup --setup_base_db --conda
+sleep 1
+
+for file in /mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15*_edited.csv; do
+	name=$(basename "$file" _edited.csv)
+	name=${name#list_available_files15}
+
+	mkdir -p /mnt/d/naura_ashanna_cps_genes/outputs/zdb/serogroup_15/test_loop/15"$name"
+	zdb run --input="$file" \
+		--out=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/serogroup_15/test_loop/15"$name" \
+		--cpu=20;
+done
+
+# Individual run
+# 15A
+zdb run --input=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15A_edited.csv \
+	--out=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/serogroup_15/15A \
+	--cpu=20
+zdb webapp --dir=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/serogroup_15/15A
+
+# 15B
+zdb run --input=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15B_edited.csv \
+	--out=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/serogroup_15/15B \
+	--cpu=20
+zdb webapp --dir=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/serogroup_15/15B
+
+# 15C
+zdb run --input=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available_files15C_edited.csv \
+	--out=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/serogroup_15/15C \
+	--cpu=20
+zdb webapp --dir=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/serogroup_15/15C
+
+# 15F only 1 isolate
