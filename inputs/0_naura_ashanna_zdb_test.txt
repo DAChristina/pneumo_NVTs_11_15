@@ -67,7 +67,6 @@ zdb run --input=/mnt/d/naura_ashanna_cps_genes/inputs/prepare_zdb/list_available
 	--out=/mnt/d/naura_ashanna_cps_genes/outputs/zdb/11A \
 	--name=11A \
 	--cpu=20 \
-	--minimal \
 	--resume
 
 zdb export --name=infallible_poincare
